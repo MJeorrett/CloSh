@@ -7,7 +7,7 @@ namespace CLoxSh
 {
     class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor
     {
-        private readonly Environment _environment = new Environment();
+        private Environment _environment = new Environment();
 
         public void Interpret(List<Stmt> statements)
         {
@@ -27,6 +27,30 @@ namespace CLoxSh
         private void Execute(Stmt statement)
         {
             statement.Accept(this);
+        }
+
+        public void VisitBlockStmt(Stmt.Block stmt)
+        {
+            ExecuteBlock(stmt.statements, new Environment(_environment));
+        }
+
+        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        {
+            var previousEnvironment = _environment;
+
+            try
+            {
+                _environment = environment;
+
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                _environment = previousEnvironment;
+            }
         }
 
         public void VisitExpressionStmt(Stmt.Expression stmt)

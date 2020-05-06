@@ -33,6 +33,8 @@ namespace CLoxSh
 
             Run(text);
 
+            Console.ReadLine();
+
             if (_hadError) System.Environment.Exit(65);
             if (_hadRuntimeError) System.Environment.Exit(70);
         }

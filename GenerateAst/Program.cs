@@ -27,6 +27,7 @@ namespace GenerateAst
 
             DefineAst(outputDir, "Stmt", new List<string>
             {
+                "Block      : List<Stmt> statements",
                 "Expression : Expr expression",
                 "Print      : Expr expression",
                 "Var        : Token name, Expr initialiser",
@@ -49,6 +50,8 @@ namespace GenerateAst
             var writer = new CustomStreamWriter(path);
 
             writer
+                .WriteLine("using System.Collections.Generic;")
+                .WriteLine("")
                 .WriteLine("namespace CLoxSh")
                 .WriteLine("{")
                 .IncrementIndent()

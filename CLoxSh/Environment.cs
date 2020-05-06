@@ -5,7 +5,18 @@ namespace CLoxSh
 {
     class Environment
     {
+        private readonly Environment _enclosing;
         private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+
+        public Environment()
+        {
+            _enclosing = null;
+        }
+
+        public Environment(Environment enclosing)
+        {
+            _enclosing = enclosing;
+        }
 
         public void Define(string name, object value)
         {
@@ -20,12 +31,20 @@ namespace CLoxSh
                 return;
             }
 
+            if (_enclosing != null)
+            {
+                _enclosing.Define(name, value);
+                return;
+            }
+
             throw new RuntimeException($"Undefined variable {name.Lexeme}.", name);
         }
 
         public object Get(Token name)
         {
             if (_values.ContainsKey(name.Lexeme)) return _values[name.Lexeme];
+
+            if (_enclosing != null) return _enclosing.Get(name);
 
             throw new RuntimeException($"Undefined variable '{name.Lexeme}'.", name);
         }
