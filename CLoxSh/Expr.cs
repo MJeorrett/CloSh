@@ -4,6 +4,7 @@ namespace CLoxSh
     {
         internal interface IVisitor<T>
         {
+            T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
@@ -12,6 +13,22 @@ namespace CLoxSh
         }
         
         internal abstract T Accept<T>(IVisitor<T> visitor);
+        
+        internal class Assign : Expr
+        {
+            public readonly Token name;
+            public readonly Expr value;
+            
+            public Assign(Token name, Expr value)
+            {
+                this.name = name;
+                this.value = value;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitAssignExpr(this);
+            }
+        }
         
         internal class Binary : Expr
         {

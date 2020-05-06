@@ -53,6 +53,15 @@ namespace CLoxSh
             _environment.Define(stmt.name.Lexeme, value);
         }
 
+        public object VisitAssignExpr(Expr.Assign expr)
+        {
+            var value = Evaluate(expr.value);
+
+            _environment.Define(expr.name, value);
+
+            return value;
+        }
+
         public object VisitBinaryExpr(Expr.Binary expr)
         {
             var left = Evaluate(expr.Left);

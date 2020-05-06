@@ -11,6 +11,11 @@ namespace CLoxSh
             return expr.Accept(this);
         }
 
+        public string VisitAssignExpr(Expr.Assign expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitBinaryExpr(Expr.Binary expr)
         {
             return Parenthasize(expr.Operator.Lexeme, expr.Left, expr.Right);

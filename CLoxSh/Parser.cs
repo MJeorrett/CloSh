@@ -43,9 +43,10 @@ namespace CLoxSh
 
                 return Statement();
             }
-            catch (ParserException)
+            catch (ParserException exception)
             {
                 Synchronize();
+                Program.Error(exception.Line, exception.Message);
                 return null;
             }
         }
@@ -91,7 +92,28 @@ namespace CLoxSh
 
         private Expr Expression()
         {
-            return Equality();
+            return Assignment();
+        }
+
+        private Expr Assignment()
+        {
+            var expr = Equality();
+
+            if (Match(EQUAL))
+            {
+                var equals = Previous;
+                var value = Assignment();
+
+                if (expr is Expr.Variable variableExpr)
+                {
+                    var name = variableExpr.name;
+                    return new Expr.Assign(name, value);
+                }
+
+                Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
         }
 
         private Expr Equality()
@@ -206,13 +228,13 @@ namespace CLoxSh
         {
             if (Check(type)) return Advance();
 
-            throw new Exception($"{Peek}: {message}");
+            throw new ParserException($"{Peek}: {message}", _current);
         }
 
         private ParserException Error(Token token, string message)
         {
             Program.Error(token, message);
-            return new ParserException();
+            return new ParserException(message, token.Line);
         }
 
         private void Synchronize()
