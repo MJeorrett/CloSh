@@ -46,6 +46,13 @@ namespace GenerateAst
                     .WriteLine("{")
                     .IncrementIndent();
 
+            DefineVisitor(writer, baseName, types);
+
+            writer
+                .WriteLine("")
+                .WriteLine("internal abstract T Accept<T>(IVisitor<T> visitor);")
+                .WriteLine("");
+
             foreach (var type in types)
             {
                 var className = type.Split(":")[0].Trim();
@@ -72,7 +79,7 @@ namespace GenerateAst
             var fields = fieldList.Split(", ");
 
             writer
-                .WriteLine($"class {className} : {baseName}")
+                .WriteLine($"internal class {className} : {baseName}")
                 .WriteLine("{")
                 .IncrementIndent();
 
@@ -97,7 +104,40 @@ namespace GenerateAst
 
             writer
                     .DecrementIndent()
-                    .WriteLine("}")
+                    .WriteLine("}");
+
+            // Implement Accept
+            writer
+                    .WriteLine("internal override T Accept<T>(IVisitor<T> visitor)")
+                    .WriteLine("{")
+                    .IncrementIndent()
+                        .WriteLine($"return visitor.Visit{className}{baseName}(this);")
+                    .DecrementIndent()
+                    .WriteLine("}");
+
+            writer
+                .DecrementIndent()
+                .WriteLine("}");
+        }
+
+        private static void DefineVisitor(
+            CustomStreamWriter writer,
+            string baseName,
+            List<string> types)
+        {
+            writer
+                .WriteLine("internal interface IVisitor<T>")
+                .WriteLine("{")
+                .IncrementIndent();
+
+            foreach (var type in types)
+            {
+                var typeName = type.Split(":")[0].Trim();
+                writer
+                    .WriteLine($"T Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
+            }
+
+            writer
                 .DecrementIndent()
                 .WriteLine("}");
         }

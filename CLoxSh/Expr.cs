@@ -2,7 +2,17 @@ namespace CLoxSh
 {
     abstract class Expr
     {
-        class Binary : Expr
+        internal interface IVisitor<T>
+        {
+            T VisitBinaryExpr(Binary expr);
+            T VisitGroupingExpr(Grouping expr);
+            T VisitLiteralExpr(Literal expr);
+            T VisitUnaryExpr(Unary expr);
+        }
+        
+        internal abstract T Accept<T>(IVisitor<T> visitor);
+        
+        internal class Binary : Expr
         {
             private readonly Expr left;
             private readonly Token @operator;
@@ -14,9 +24,13 @@ namespace CLoxSh
                 this.@operator = @operator;
                 this.right = right;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitBinaryExpr(this);
+            }
         }
         
-        class Grouping : Expr
+        internal class Grouping : Expr
         {
             private readonly Expr expression;
             
@@ -24,9 +38,13 @@ namespace CLoxSh
             {
                 this.expression = expression;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitGroupingExpr(this);
+            }
         }
         
-        class Literal : Expr
+        internal class Literal : Expr
         {
             private readonly object value;
             
@@ -34,9 +52,13 @@ namespace CLoxSh
             {
                 this.value = value;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitLiteralExpr(this);
+            }
         }
         
-        class Unary : Expr
+        internal class Unary : Expr
         {
             private readonly Token @operator;
             private readonly Expr right;
@@ -45,6 +67,10 @@ namespace CLoxSh
             {
                 this.@operator = @operator;
                 this.right = right;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitUnaryExpr(this);
             }
         }
         
