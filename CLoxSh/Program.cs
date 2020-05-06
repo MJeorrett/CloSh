@@ -1,11 +1,14 @@
-﻿using System;
+﻿using CLoxSh.Exceptions;
+using System;
 using System.IO;
 
 namespace CLoxSh
 {
     class Program
     {
+        private static readonly Interpreter _interpreter = new Interpreter();
         private static bool _hadError = false;
+        private static bool _hadRuntimeError = false;
 
         static void Main(string[] args)
         {
@@ -31,6 +34,7 @@ namespace CLoxSh
             Run(text);
 
             if (_hadError) Environment.Exit(65);
+            if (_hadRuntimeError) Environment.Exit(70);
         }
 
         private static void RunPrompt()
@@ -52,6 +56,8 @@ namespace CLoxSh
 
             if (_hadError) return;
 
+            _interpreter.Interpret(expression);
+
             Console.WriteLine(new AstPrinter().Print(expression));
         }
 
@@ -70,6 +76,12 @@ namespace CLoxSh
             {
                 Report(token.Line, $"at '{token.Lexeme}'", message);
             }
+        }
+
+        public static void RuntimeError(RuntimeException exception)
+        {
+            Console.Error.WriteLine($"{exception}\n[line {exception.Token.Line}]");
+            _hadRuntimeError = true;
         }
 
         private static void Report(int line, string where, string message)

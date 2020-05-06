@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CLoxSh.Exceptions;
+using System;
 using System.Collections.Generic;
 
 using static CLoxSh.TokenType;
@@ -7,8 +8,6 @@ namespace CLoxSh
 {
     class Parser
     {
-        private class ParseException : Exception { }
-
         private readonly List<Token> _tokens;
 
         private int _current = 0;
@@ -30,7 +29,7 @@ namespace CLoxSh
             {
                 return Expression();
             }
-            catch (ParseException)
+            catch (ParserException)
             {
                 return null;
             }
@@ -151,10 +150,10 @@ namespace CLoxSh
             throw new Exception($"{Peek}: {message}");
         }
 
-        private ParseException Error(Token token, string message)
+        private ParserException Error(Token token, string message)
         {
             Program.Error(token, message);
-            return new ParseException();
+            return new ParserException();
         }
 
         private void Synchronize()
