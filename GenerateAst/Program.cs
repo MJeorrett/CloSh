@@ -17,10 +17,10 @@ namespace GenerateAst
 
             DefineAst(outputDir, "Expr", new List<string>
             {
-                "Binary   : Expr left, Token @operator, Expr right",
-                "Grouping : Expr expression",
-                "Literal  : object value",
-                "Unary    : Token @operator, Expr right",
+                "Binary   : Expr Left, Token Operator, Expr Right",
+                "Grouping : Expr Expression",
+                "Literal  : object Value",
+                "Unary    : Token Operator, Expr Right",
             });
         }
 
@@ -86,13 +86,13 @@ namespace GenerateAst
             // Fields
             foreach (var field in fields)
             {
-                writer.WriteLine($"private readonly {field};");
+                writer.WriteLine($"public readonly {field};");
             }
 
             // Constructor
             writer
                     .WriteLine("")
-                    .WriteLine($"{className}({fieldList})")
+                    .WriteLine($"public {className}({fieldList})")
                     .WriteLine("{")
                     .IncrementIndent();
 

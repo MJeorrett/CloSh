@@ -14,15 +14,15 @@ namespace CLoxSh
         
         internal class Binary : Expr
         {
-            private readonly Expr left;
-            private readonly Token @operator;
-            private readonly Expr right;
+            public readonly Expr Left;
+            public readonly Token Operator;
+            public readonly Expr Right;
             
-            Binary(Expr left, Token @operator, Expr right)
+            public Binary(Expr Left, Token Operator, Expr Right)
             {
-                this.left = left;
-                this.@operator = @operator;
-                this.right = right;
+                this.Left = Left;
+                this.Operator = Operator;
+                this.Right = Right;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {
@@ -32,11 +32,11 @@ namespace CLoxSh
         
         internal class Grouping : Expr
         {
-            private readonly Expr expression;
+            public readonly Expr Expression;
             
-            Grouping(Expr expression)
+            public Grouping(Expr Expression)
             {
-                this.expression = expression;
+                this.Expression = Expression;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {
@@ -46,11 +46,11 @@ namespace CLoxSh
         
         internal class Literal : Expr
         {
-            private readonly object value;
+            public readonly object Value;
             
-            Literal(object value)
+            public Literal(object Value)
             {
-                this.value = value;
+                this.Value = Value;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {
@@ -60,13 +60,13 @@ namespace CLoxSh
         
         internal class Unary : Expr
         {
-            private readonly Token @operator;
-            private readonly Expr right;
+            public readonly Token Operator;
+            public readonly Expr Right;
             
-            Unary(Token @operator, Expr right)
+            public Unary(Token Operator, Expr Right)
             {
-                this.@operator = @operator;
-                this.right = right;
+                this.Operator = Operator;
+                this.Right = Right;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {
