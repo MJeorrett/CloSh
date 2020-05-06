@@ -33,6 +33,11 @@ namespace CLoxSh
             return Parenthasize(expr.Operator.Lexeme, expr.Right);
         }
 
+        public string VisitVariableExpr(Expr.Variable expr)
+        {
+            throw new NotImplementedException();
+        }
+
         private string Parenthasize(string name, params Expr[] exprs)
         {
             var builder = new StringBuilder();

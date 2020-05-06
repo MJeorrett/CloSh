@@ -8,6 +8,7 @@ namespace CLoxSh
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitUnaryExpr(Unary expr);
+            T VisitVariableExpr(Variable expr);
         }
         
         internal abstract T Accept<T>(IVisitor<T> visitor);
@@ -71,6 +72,20 @@ namespace CLoxSh
             internal override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitUnaryExpr(this);
+            }
+        }
+        
+        internal class Variable : Expr
+        {
+            public readonly Token name;
+            
+            public Variable(Token name)
+            {
+                this.name = name;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitVariableExpr(this);
             }
         }
         

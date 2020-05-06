@@ -17,16 +17,18 @@ namespace GenerateAst
 
             DefineAst(outputDir, "Expr", new List<string>
             {
-                "Binary   : Expr Left, Token Operator, Expr Right",
-                "Grouping : Expr Expression",
-                "Literal  : object Value",
-                "Unary    : Token Operator, Expr Right",
+                "Binary     : Expr Left, Token Operator, Expr Right",
+                "Grouping   : Expr Expression",
+                "Literal    : object Value",
+                "Unary      : Token Operator, Expr Right",
+                "Variable   : Token name",
             }, true);
 
             DefineAst(outputDir, "Stmt", new List<string>
             {
                 "Expression : Expr expression",
                 "Print      : Expr expression",
+                "Var        : Token name, Expr initialiser",
             }, false);
         }
 

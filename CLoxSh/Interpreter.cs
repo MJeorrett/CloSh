@@ -7,6 +7,8 @@ namespace CLoxSh
 {
     class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor
     {
+        private readonly Environment _environment = new Environment();
+
         public void Interpret(List<Stmt> statements)
         {
             try
@@ -37,6 +39,18 @@ namespace CLoxSh
             var value = Evaluate(stmt.expression);
 
             Console.WriteLine(Stringify(value));
+        }
+
+        public void VisitVarStmt(Stmt.Var stmt)
+        {
+            object value = null;
+
+            if (stmt.initialiser != null)
+            {
+                value = Evaluate(stmt.initialiser);
+            }
+
+            _environment.Define(stmt.name.Lexeme, value);
         }
 
         public object VisitBinaryExpr(Expr.Binary expr)
@@ -111,6 +125,11 @@ namespace CLoxSh
             }
 
             return null;
+        }
+
+        public object VisitVariableExpr(Expr.Variable expr)
+        {
+            return _environment.Get(expr.name);
         }
 
         private object Evaluate(Expr expr)
