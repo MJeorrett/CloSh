@@ -52,13 +52,11 @@ namespace CLoxSh
             var scanner = new Scanner(source);
             var tokens = scanner.ScanTokens();
             var parser = new Parser(tokens);
-            var expression = parser.Parse();
+            var statements = parser.Parse();
 
             if (_hadError) return;
 
-            _interpreter.Interpret(expression);
-
-            Console.WriteLine(new AstPrinter().Print(expression));
+            _interpreter.Interpret(statements);
         }
 
         public static void Error(int line, string message)

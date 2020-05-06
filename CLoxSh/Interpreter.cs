@@ -1,22 +1,42 @@
 ﻿using CLoxSh.Exceptions;
 using System;
+using System.Collections.Generic;
 using static CLoxSh.TokenType;
 
 namespace CLoxSh
 {
-    class Interpreter : Expr.IVisitor<object>
+    class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor
     {
-        public void Interpret(Expr expr)
+        public void Interpret(List<Stmt> statements)
         {
             try
             {
-                var value = Evaluate(expr);
-                Console.WriteLine(value);
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeException exception)
             {
                 Program.RuntimeError(exception);
             }
+        }
+
+        private void Execute(Stmt statement)
+        {
+            statement.Accept(this);
+        }
+
+        public void VisitExpressionStmt(Stmt.Expression stmt)
+        {
+            Evaluate(stmt.expression);
+        }
+
+        public void VisitPrintStmt(Stmt.Print stmt)
+        {
+            var value = Evaluate(stmt.expression);
+
+            Console.WriteLine(Stringify(value));
         }
 
         public object VisitBinaryExpr(Expr.Binary expr)
