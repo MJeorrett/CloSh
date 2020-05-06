@@ -77,6 +77,10 @@ namespace CLoxSh
                     {
                         Number();
                     }
+                    else if (IsAlpha(c))
+                    {
+                        Identifier();
+                    }
                     else
                     {
                         Program.Error(_line, "Unexpected character.");
@@ -165,6 +169,33 @@ namespace CLoxSh
             var text = _source.Substring(_start, _current - _start);
 
             AddToken(NUMBER, double.Parse(text));
+        }
+
+        private bool IsAlpha(char c)
+        {
+            return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+        }
+
+        private bool IsAlphaNumeric(char c)
+        {
+            return IsAlpha(c) || IsDigit(c);
+        }
+
+        private void Identifier()
+        {
+            while (IsAlphaNumeric(Peek())) Advance();
+
+            var text = _source.Substring(_start, _current - _start);
+            var type = IDENTIFIER;
+
+            if (Constants.Keywords.ContainsKey(text))
+            {
+                type = Constants.Keywords[text];
+            }
+
+            AddToken(type);
         }
     }
 }
