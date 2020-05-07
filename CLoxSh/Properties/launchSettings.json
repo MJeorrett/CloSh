@@ -2,7 +2,7 @@
   "profiles": {
     "CLoxSh": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\git\\tuesdaychain\\CLoxSh\\CLoxSh\\source.txt"
+      "commandLineArgs": "C:\\git\\tuesdaychain\\CLoxSh\\source.txt"
     }
   }
 }
