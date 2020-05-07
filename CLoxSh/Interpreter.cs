@@ -77,6 +77,14 @@ namespace CLoxSh
             Console.WriteLine(Stringify(value));
         }
 
+        public void VisitWhileStmt(Stmt.While stmt)
+        {
+            while (IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.Body);
+            }
+        }
+
         public void VisitVarStmt(Stmt.Var stmt)
         {
             object value = null;

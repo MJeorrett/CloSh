@@ -67,11 +67,75 @@ namespace CLoxSh
 
         private Stmt Statement()
         {
+            if (Match(FOR)) return ForStatement();
             if (Match(IF)) return IfStatement();
             if (Match(PRINT)) return PrintStatement();
+            if (Match(WHILE)) return WhileStatement();
             if (Match(LEFT_BRACE)) return new Stmt.Block(Block());
 
             return ExpressionStatement();
+        }
+
+        private Stmt ForStatement()
+        {
+            Consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+            Stmt initialiser = null;
+
+            if (Match(SEMICOLON))
+            {
+                initialiser = null;
+            }
+            else if (Match(VAR))
+            {
+                initialiser = VarDeclaration();
+            }
+            else
+            {
+                initialiser = ExpressionStatement();
+            }
+
+            Expr condition = null;
+
+            if (!Check(SEMICOLON))
+            {
+                condition = Expression();
+            }
+
+            Consume(SEMICOLON, "Expect ';' after loop condition.");
+
+            Expr increment = null;
+
+            if (!Check(RIGHT_PAREN))
+            {
+                increment = Expression();
+            }
+
+            Consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+            var body = Statement();
+
+            if (increment != null)
+            {
+                body = new Stmt.Block(new List<Stmt>() {
+                    body,
+                    new Stmt.Expression(increment)
+                });
+            }
+
+            if (condition == null) condition = new Expr.Literal(true);
+            body = new Stmt.While(condition, body);
+
+            if (initialiser != null)
+            {
+                body = new Stmt.Block(new List<Stmt>()
+                {
+                    initialiser,
+                    body,
+                });
+            }
+
+            return body;
         }
 
         private Stmt IfStatement()
@@ -90,6 +154,25 @@ namespace CLoxSh
             return new Stmt.If(condition, thenBranch, elseBranch);
         }
 
+        private Stmt PrintStatement()
+        {
+            var value = Expression();
+
+            Consume(SEMICOLON, "Expect ';' after value.");
+
+            return new Stmt.Print(value);
+        }
+
+        private Stmt WhileStatement()
+        {
+            Consume(LEFT_PAREN, "Expect '(' after 'while'.");
+            var condition = Expression();
+            Consume(RIGHT_PAREN, "Expect ') after condition'.");
+            var body = Statement();
+
+            return new Stmt.While(condition, body);
+        }
+
         private List<Stmt> Block()
         {
             var statements = new List<Stmt>();
@@ -102,15 +185,6 @@ namespace CLoxSh
             Consume(RIGHT_BRACE, "Expect '}' after block.");
 
             return statements;
-        }
-
-        private Stmt PrintStatement()
-        {
-            var value = Expression();
-
-            Consume(SEMICOLON, "Expect ';' after value.");
-
-            return new Stmt.Print(value);
         }
 
         private Stmt ExpressionStatement()

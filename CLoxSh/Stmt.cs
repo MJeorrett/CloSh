@@ -11,6 +11,7 @@ namespace CLoxSh
             void VisitIfStmt(If stmt);
             void VisitPrintStmt(Print stmt);
             void VisitVarStmt(Var stmt);
+            void VisitWhileStmt(While stmt);
         }
         
         internal abstract void Accept(IVisitor visitor);
@@ -88,6 +89,22 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitVarStmt(this);
+            }
+        }
+        
+        internal class While : Stmt
+        {
+            public readonly Expr Condition;
+            public readonly Stmt Body;
+            
+            public While(Expr Condition, Stmt Body)
+            {
+                this.Condition = Condition;
+                this.Body = Body;
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitWhileStmt(this);
             }
         }
         

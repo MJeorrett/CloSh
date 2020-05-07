@@ -33,6 +33,7 @@ namespace GenerateAst
                 "If         : Expr Condition, Stmt ThenBranch, Stmt ElseBranch",
                 "Print      : Expr Expression",
                 "Var        : Token Name, Expr Initialiser",
+                "While      : Expr Condition, Stmt Body",
             }, false);
         }
 
