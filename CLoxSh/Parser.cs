@@ -46,7 +46,6 @@ namespace CLoxSh
             catch (ParserException exception)
             {
                 Synchronize();
-                Program.Error(exception.Line, exception.Message);
                 return null;
             }
         }
@@ -362,13 +361,13 @@ namespace CLoxSh
         {
             if (Check(type)) return Advance();
 
-            throw new ParserException($"{Peek}: {message}", _current);
+            throw Error(Peek, message);
         }
 
         private ParserException Error(Token token, string message)
         {
             Program.Error(token, message);
-            return new ParserException(message, token.Line);
+            return new ParserException(message);
         }
 
         private void Synchronize()
