@@ -7,6 +7,7 @@ namespace CLoxSh
         internal interface IVisitor
         {
             void VisitBlockStmt(Block stmt);
+            void VisitClassStmt(Class stmt);
             void VisitExpressionStmt(Expression stmt);
             void VisitFunctionStmt(Function stmt);
             void VisitIfStmt(If stmt);
@@ -19,6 +20,7 @@ namespace CLoxSh
         internal interface IVisitor<T>
         {
             T VisitBlockStmt(Block stmt);
+            T VisitClassStmt(Class stmt);
             T VisitExpressionStmt(Expression stmt);
             T VisitFunctionStmt(Function stmt);
             T VisitIfStmt(If stmt);
@@ -46,6 +48,26 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitBlockStmt(this);
+            }
+        }
+        
+        internal class Class : Stmt
+        {
+            public readonly Token Name;
+            public readonly List<Stmt.Function> Methods;
+            
+            public Class(Token Name, List<Stmt.Function> Methods)
+            {
+                this.Name = Name;
+                this.Methods = Methods;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitClassStmt(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitClassStmt(this);
             }
         }
         

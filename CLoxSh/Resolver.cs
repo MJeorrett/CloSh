@@ -70,12 +70,23 @@ namespace CLoxSh
 
         public void VisitCallExpr(Expr.Call expr)
         {
-            Resolve(expr.callee);
+            Resolve(expr.Callee);
 
-            foreach (var argument in expr.arguments)
+            foreach (var argument in expr.Arguments)
             {
                 Resolve(argument);
             }
+        }
+
+        public void VisitGetExpr(Expr.Get expr)
+        {
+            Resolve(expr.Target);
+        }
+
+        public void VisitClassStmt(Stmt.Class stmt)
+        {
+            Declare(stmt.Name);
+            Define(stmt.Name);
         }
 
         public void VisitExpressionStmt(Stmt.Expression stmt)
@@ -131,6 +142,12 @@ namespace CLoxSh
         {
             Resolve(expr.Left);
             Resolve(expr.Right);
+        }
+
+        public void VisitSetExpr(Expr.Set expr)
+        {
+            Resolve(expr.Value);
+            Resolve(expr.Target);
         }
 
         public void VisitPrintStmt(Stmt.Print stmt)

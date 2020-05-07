@@ -19,10 +19,12 @@ namespace GenerateAst
             {
                 "Assign     : Token Name, Expr Value",
                 "Binary     : Expr Left, Token Operator, Expr Right",
-                "Call       : Expr callee, Token closingParen, List<Expr> arguments",
+                "Call       : Expr Callee, Token ClosingParen, List<Expr> Arguments",
+                "Get        : Expr Target, Token Name",
                 "Grouping   : Expr Expression",
                 "Literal    : object Value",
                 "Logical    : Expr Left, Token Operator, Expr Right",
+                "Set        : Expr Target, Token Name, Expr Value",
                 "Unary      : Token Operator, Expr Right",
                 "Variable   : Token Name",
             });
@@ -30,6 +32,7 @@ namespace GenerateAst
             DefineAst(outputDir, "Stmt", new List<string>
             {
                 "Block      : List<Stmt> Statements",
+                "Class      : Token Name, List<Stmt.Function> Methods",
                 "Expression : Expr Expr",
                 "Function   : Token Name, List<Token> Parameters, List<Stmt> Body",
                 "If         : Expr Condition, Stmt ThenBranch, Stmt ElseBranch",

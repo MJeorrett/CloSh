@@ -67,6 +67,13 @@ namespace CLoxSh
             }
         }
 
+        public void VisitClassStmt(Stmt.Class stmt)
+        {
+            _environment.Define(stmt.Name.Lexeme, null);
+            var klass = new CLoxShClass(stmt.Name.Lexeme);
+            _environment.Assign(stmt.Name, klass);
+        }
+
         public void VisitIfStmt(Stmt.If stmt)
         {
             if (IsTruthy(Evaluate(stmt.Condition)))
@@ -193,11 +200,11 @@ namespace CLoxSh
 
         public object VisitCallExpr(Expr.Call expr)
         {
-            var callee = Evaluate(expr.callee);
+            var callee = Evaluate(expr.Callee);
 
             var arguments = new List<object>();
 
-            foreach (var argument in expr.arguments)
+            foreach (var argument in expr.Arguments)
             {
                 arguments.Add(Evaluate(argument));
             }
@@ -206,14 +213,41 @@ namespace CLoxSh
             {
                 if (arguments.Count != function.Arity)
                 {
-                    throw new RuntimeException($"Expected {function.Arity} arguments, but got {arguments.Count}.", expr.closingParen);
+                    throw new RuntimeException($"Expected {function.Arity} arguments, but got {arguments.Count}.", expr.ClosingParen);
                 }
                 return function.Call(this, arguments);
             }
             else
             {
-                throw new RuntimeException("Can only call functinos and classes.", expr.closingParen);
+                throw new RuntimeException("Can only call functinos and classes.", expr.ClosingParen);
             }
+        }
+
+        public object VisitSetExpr(Expr.Set expr)
+        {
+            var target = Evaluate(expr.Target);
+
+            if (target is CLoxShInstance instance)
+            {
+                var value = Evaluate(expr.Value);
+                instance.Set(expr.Name, value);
+                return value;
+            }
+            else
+            {
+                throw new RuntimeException("Only instances have fields.", expr.Name);
+            }
+        }
+
+        public object VisitGetExpr(Expr.Get expr)
+        {
+            var @object = Evaluate(expr.Target);
+            if (@object is CLoxShInstance instance)
+            {
+                return instance.Get(expr.Name);
+            }
+
+            throw new RuntimeException("Only instances have properties.", expr.Name);
         }
 
         public object VisitGroupingExpr(Expr.Grouping expr)

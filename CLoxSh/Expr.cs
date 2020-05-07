@@ -9,9 +9,11 @@ namespace CLoxSh
             void VisitAssignExpr(Assign expr);
             void VisitBinaryExpr(Binary expr);
             void VisitCallExpr(Call expr);
+            void VisitGetExpr(Get expr);
             void VisitGroupingExpr(Grouping expr);
             void VisitLiteralExpr(Literal expr);
             void VisitLogicalExpr(Logical expr);
+            void VisitSetExpr(Set expr);
             void VisitUnaryExpr(Unary expr);
             void VisitVariableExpr(Variable expr);
         }
@@ -21,9 +23,11 @@ namespace CLoxSh
             T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
             T VisitCallExpr(Call expr);
+            T VisitGetExpr(Get expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
+            T VisitSetExpr(Set expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
@@ -75,15 +79,15 @@ namespace CLoxSh
         
         internal class Call : Expr
         {
-            public readonly Expr callee;
-            public readonly Token closingParen;
-            public readonly List<Expr> arguments;
+            public readonly Expr Callee;
+            public readonly Token ClosingParen;
+            public readonly List<Expr> Arguments;
             
-            public Call(Expr callee, Token closingParen, List<Expr> arguments)
+            public Call(Expr Callee, Token ClosingParen, List<Expr> Arguments)
             {
-                this.callee = callee;
-                this.closingParen = closingParen;
-                this.arguments = arguments;
+                this.Callee = Callee;
+                this.ClosingParen = ClosingParen;
+                this.Arguments = Arguments;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {
@@ -92,6 +96,26 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitCallExpr(this);
+            }
+        }
+        
+        internal class Get : Expr
+        {
+            public readonly Expr Target;
+            public readonly Token Name;
+            
+            public Get(Expr Target, Token Name)
+            {
+                this.Target = Target;
+                this.Name = Name;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitGetExpr(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitGetExpr(this);
             }
         }
         
@@ -150,6 +174,28 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitLogicalExpr(this);
+            }
+        }
+        
+        internal class Set : Expr
+        {
+            public readonly Expr Target;
+            public readonly Token Name;
+            public readonly Expr Value;
+            
+            public Set(Expr Target, Token Name, Expr Value)
+            {
+                this.Target = Target;
+                this.Name = Name;
+                this.Value = Value;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitSetExpr(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitSetExpr(this);
             }
         }
         
