@@ -25,6 +25,7 @@ namespace GenerateAst
                 "Literal    : object Value",
                 "Logical    : Expr Left, Token Operator, Expr Right",
                 "Set        : Expr Target, Token Name, Expr Value",
+                "This       : Token keyword",
                 "Unary      : Token Operator, Expr Right",
                 "Variable   : Token Name",
             });

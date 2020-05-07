@@ -248,6 +248,11 @@ namespace CLoxSh
             }
         }
 
+        public object VisitThisExpr(Expr.This expr)
+        {
+            return LookUpVariable(expr.keyword, expr);
+        }
+
         public object VisitGetExpr(Expr.Get expr)
         {
             var @object = Evaluate(expr.Target);

@@ -14,6 +14,7 @@ namespace CLoxSh
             void VisitLiteralExpr(Literal expr);
             void VisitLogicalExpr(Logical expr);
             void VisitSetExpr(Set expr);
+            void VisitThisExpr(This expr);
             void VisitUnaryExpr(Unary expr);
             void VisitVariableExpr(Variable expr);
         }
@@ -28,6 +29,7 @@ namespace CLoxSh
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
             T VisitSetExpr(Set expr);
+            T VisitThisExpr(This expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
@@ -196,6 +198,24 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitSetExpr(this);
+            }
+        }
+        
+        internal class This : Expr
+        {
+            public readonly Token keyword;
+            
+            public This(Token keyword)
+            {
+                this.keyword = keyword;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitThisExpr(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitThisExpr(this);
             }
         }
         

@@ -90,10 +90,15 @@ namespace CLoxSh
             Declare(stmt.Name);
             Define(stmt.Name);
 
+            BeginScope();
+            _scopes.Peek()["this"] = true;
+
             foreach (var method in stmt.Methods)
             {
                 ResolveFunction(method, FunctionType.METHOD);
             }
+
+            EndScope();
         }
 
         public void VisitExpressionStmt(Stmt.Expression stmt)
@@ -157,6 +162,11 @@ namespace CLoxSh
             Resolve(expr.Target);
         }
 
+        public void VisitThisExpr(Expr.This expr)
+        {
+            ResolveLocal(expr, expr.keyword);
+        }
+
         public void VisitPrintStmt(Stmt.Print stmt)
         {
             Resolve(stmt.Expression);
@@ -191,11 +201,11 @@ namespace CLoxSh
 
         private void ResolveLocal(Expr expr, Token name)
         {
-            for (int i = _scopes.Count - 1; i >= 0; i--)
+            for (int i = 0; i < _scopes.Count; i++)
             {
                 if (_scopes.ElementAt(i).ContainsKey(name.Lexeme))
                 {
-                    _interpreter.Resolve(expr, _scopes.Count - 1 - i);
+                    _interpreter.Resolve(expr, i);
                     return;
                 }
             }
