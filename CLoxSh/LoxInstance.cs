@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace CLoxSh
 {
-    class CLoxShInstance
+    class LoxInstance
     {
-        private CLoxShClass _klass;
+        private readonly LoxClass _klass;
         private readonly Dictionary<string, object> _fields = new Dictionary<string, object>();
 
-        public CLoxShInstance(CLoxShClass klass)
+        public LoxInstance(LoxClass klass)
         {
             _klass = klass;
         }

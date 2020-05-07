@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace CLoxSh
 {
-    class CLoxShFunction : ICLoxShCallable
+    class LoxFunction : ILoxCallable
     {
         public int Arity => _declaration.Parameters.Count;
 
         private readonly Stmt.Function _declaration;
         private readonly Environment _closure;
 
-        public CLoxShFunction(
+        public LoxFunction(
             Stmt.Function declaration,
             Environment closure)
         {

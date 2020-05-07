@@ -71,15 +71,15 @@ namespace CLoxSh
         {
             _environment.Define(stmt.Name.Lexeme, null);
 
-            var methods = new Dictionary<string, CLoxShFunction>();
+            var methods = new Dictionary<string, LoxFunction>();
 
             foreach (var method in stmt.Methods)
             {
-                var function = new CLoxShFunction(method, _environment);
+                var function = new LoxFunction(method, _environment);
                 methods[method.Name.Lexeme] = function;
             }
 
-            var klass = new CLoxShClass(stmt.Name.Lexeme, methods);
+            var klass = new LoxClass(stmt.Name.Lexeme, methods);
             _environment.Assign(stmt.Name, klass);
         }
 
@@ -102,7 +102,7 @@ namespace CLoxSh
 
         public void VisitFunctionStmt(Stmt.Function stmt)
         {
-            var function = new CLoxShFunction(stmt, _environment);
+            var function = new LoxFunction(stmt, _environment);
 
             _environment.Define(stmt.Name.Lexeme, function);
         }
@@ -218,7 +218,7 @@ namespace CLoxSh
                 arguments.Add(Evaluate(argument));
             }
 
-            if (callee is ICLoxShCallable function)
+            if (callee is ILoxCallable function)
             {
                 if (arguments.Count != function.Arity)
                 {
@@ -236,7 +236,7 @@ namespace CLoxSh
         {
             var target = Evaluate(expr.Target);
 
-            if (target is CLoxShInstance instance)
+            if (target is LoxInstance instance)
             {
                 var value = Evaluate(expr.Value);
                 instance.Set(expr.Name, value);
@@ -251,7 +251,7 @@ namespace CLoxSh
         public object VisitGetExpr(Expr.Get expr)
         {
             var @object = Evaluate(expr.Target);
-            if (@object is CLoxShInstance instance)
+            if (@object is LoxInstance instance)
             {
                 return instance.Get(expr.Name);
             }

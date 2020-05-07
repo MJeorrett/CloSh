@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CLoxSh.NativeFunctions
 {
-    class Clock : ICLoxShCallable
+    class Clock : ILoxCallable
     {
         public int Arity => 0;
 

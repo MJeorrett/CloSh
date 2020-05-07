@@ -2,7 +2,7 @@
 
 namespace CLoxSh
 {
-    interface ICLoxShCallable
+    interface ILoxCallable
     {
         int Arity { get; }
 

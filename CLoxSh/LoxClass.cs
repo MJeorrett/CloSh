@@ -2,14 +2,14 @@
 
 namespace CLoxSh
 {
-    class CLoxShClass : ICLoxShCallable
+    class LoxClass : ILoxCallable
     {
         public readonly string Name;
-        private readonly Dictionary<string, CLoxShFunction> _methods;
+        private readonly Dictionary<string, LoxFunction> _methods;
 
         public int Arity => 0;
 
-        public CLoxShClass(string name, Dictionary<string, CLoxShFunction> methods)
+        public LoxClass(string name, Dictionary<string, LoxFunction> methods)
         {
             Name = name;
             _methods = methods;
@@ -17,11 +17,11 @@ namespace CLoxSh
 
         public object Call(Interpreter interpreter, List<object> arguments)
         {
-            var instance = new CLoxShInstance(this);
+            var instance = new LoxInstance(this);
             return instance;
         }
 
-        public CLoxShFunction FindMethod(string name)
+        public LoxFunction FindMethod(string name)
         {
             if (_methods.TryGetValue(name, out var method))
             {
