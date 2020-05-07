@@ -23,7 +23,7 @@ namespace CLoxSh
             _values[name] = value;
         }
 
-        public void Define(Token name, object value)
+        public void Assign(Token name, object value)
         {
             if (_values.ContainsKey(name.Lexeme))
             {
@@ -33,11 +33,16 @@ namespace CLoxSh
 
             if (_enclosing != null)
             {
-                _enclosing.Define(name, value);
+                _enclosing.Assign(name, value);
                 return;
             }
 
             throw new RuntimeException($"Undefined variable {name.Lexeme}.", name);
+        }
+
+        public void AssignAt(int distance, Token name, object value)
+        {
+            Ancestor(distance)._values[name.Lexeme] = value;
         }
 
         public object Get(Token name)
@@ -47,6 +52,23 @@ namespace CLoxSh
             if (_enclosing != null) return _enclosing.Get(name);
 
             throw new RuntimeException($"Undefined variable '{name.Lexeme}'.", name);
+        }
+
+        public object GetAt(int distance, string name)
+        {
+            return Ancestor(distance)._values[name];
+        }
+
+        private Environment Ancestor(int distance)
+        {
+            var environment = this;
+
+            for (int i = 0; i < distance; i++)
+            {
+                environment = environment._enclosing;
+            }
+
+            return environment;
         }
     }
 }

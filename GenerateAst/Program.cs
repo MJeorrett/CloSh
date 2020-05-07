@@ -25,7 +25,7 @@ namespace GenerateAst
                 "Logical    : Expr Left, Token Operator, Expr Right",
                 "Unary      : Token Operator, Expr Right",
                 "Variable   : Token Name",
-            }, true);
+            });
 
             DefineAst(outputDir, "Stmt", new List<string>
             {
@@ -37,14 +37,13 @@ namespace GenerateAst
                 "Return     : Token Keyword, Expr Value",
                 "Var        : Token Name, Expr Initialiser",
                 "While      : Expr Condition, Stmt Body",
-            }, false);
+            });
         }
 
         private static void DefineAst(
             string outputDir,
             string baseName,
-            List<string> types,
-            bool visitorIsGeneric)
+            List<string> types)
         {
             var path = $"{outputDir}/{baseName}.cs";
 
@@ -65,19 +64,17 @@ namespace GenerateAst
                     .WriteLine("{")
                     .IncrementIndent();
 
-            DefineVisitor(writer, baseName, types, visitorIsGeneric);
+            DefineVisitor(writer, baseName, types);
+
+            writer.WriteLine("");
+
+            DefineGenericVisitor(writer, baseName, types);
 
             writer
                 .WriteLine("");
 
-            if (visitorIsGeneric)
-            {
-                writer.WriteLine("internal abstract T Accept<T>(IVisitor<T> visitor);");
-            }
-            else
-            {
-                writer.WriteLine("internal abstract void Accept(IVisitor visitor);");
-            }
+            writer.WriteLine("internal abstract T Accept<T>(IVisitor<T> visitor);");
+            writer.WriteLine("internal abstract void Accept(IVisitor visitor);");
 
             writer.WriteLine("");
 
@@ -85,7 +82,7 @@ namespace GenerateAst
             {
                 var className = type.Split(":")[0].Trim();
                 var fields = type.Split(":")[1].Trim();
-                DefineType(writer, baseName, className, fields, visitorIsGeneric);
+                DefineType(writer, baseName, className, fields);
                 writer.WriteLine("");
             }
 
@@ -102,8 +99,7 @@ namespace GenerateAst
             CustomStreamWriter writer,
             string baseName,
             string className,
-            string fieldList,
-            bool visitorIsGeneric)
+            string fieldList)
         {
             var fields = fieldList.Split(", ");
 
@@ -135,30 +131,21 @@ namespace GenerateAst
                     .DecrementIndent()
                     .WriteLine("}");
 
-            // Implement Accept
-            if (visitorIsGeneric)
-            {
-                writer.WriteLine("internal override T Accept<T>(IVisitor<T> visitor)");
-            }
-            else
-            {
-                writer.WriteLine("internal override void Accept(IVisitor visitor)");
-            }
-
+            // Implement Accept<T>
             writer
+                    .WriteLine("internal override T Accept<T>(IVisitor<T> visitor)")
                     .WriteLine("{")
-                    .IncrementIndent();
+                    .IncrementIndent()
+                        .WriteLine($"return visitor.Visit{className}{baseName}(this);")
+                    .DecrementIndent()
+                    .WriteLine("}");
 
-            if (visitorIsGeneric)
-            {
-                writer.WriteLine($"return visitor.Visit{className}{baseName}(this);");
-            }
-            else
-            {
-                writer.WriteLine($"visitor.Visit{className}{baseName}(this);");
-            }
-
+            // Implement Accept
             writer
+                    .WriteLine("internal override void Accept(IVisitor visitor)")
+                    .WriteLine("{")
+                    .IncrementIndent()
+                        .WriteLine($"visitor.Visit{className}{baseName}(this);")
                     .DecrementIndent()
                     .WriteLine("}");
 
@@ -170,19 +157,10 @@ namespace GenerateAst
         private static void DefineVisitor(
             CustomStreamWriter writer,
             string baseName,
-            List<string> types,
-            bool visitorIsGeneric)
+            List<string> types)
         {
-            if (visitorIsGeneric)
-            {
-                writer.WriteLine("internal interface IVisitor<T>");
-            }
-            else
-            {
-                writer.WriteLine("internal interface IVisitor");
-            }
-
             writer
+                .WriteLine("internal interface IVisitor")
                 .WriteLine("{")
                 .IncrementIndent();
 
@@ -190,14 +168,29 @@ namespace GenerateAst
             {
                 var typeName = type.Split(":")[0].Trim();
 
-                if (visitorIsGeneric)
-                {
-                    writer.WriteLine($"T Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
-                }
-                else
-                {
-                    writer.WriteLine($"void Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
-                }
+                writer.WriteLine($"void Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
+            }
+
+            writer
+                .DecrementIndent()
+                .WriteLine("}");
+        }
+
+        private static void DefineGenericVisitor(
+            CustomStreamWriter writer,
+            string baseName,
+            List<string> types)
+        {
+            writer
+                .WriteLine("internal interface IVisitor<T>")
+                .WriteLine("{")
+                .IncrementIndent();
+
+            foreach (var type in types)
+            {
+                var typeName = type.Split(":")[0].Trim();
+
+                writer.WriteLine($"T Visit{typeName}{baseName}({typeName} {baseName.ToLower()});");
             }
 
             writer

@@ -16,6 +16,19 @@ namespace CLoxSh
             void VisitWhileStmt(While stmt);
         }
         
+        internal interface IVisitor<T>
+        {
+            T VisitBlockStmt(Block stmt);
+            T VisitExpressionStmt(Expression stmt);
+            T VisitFunctionStmt(Function stmt);
+            T VisitIfStmt(If stmt);
+            T VisitPrintStmt(Print stmt);
+            T VisitReturnStmt(Return stmt);
+            T VisitVarStmt(Var stmt);
+            T VisitWhileStmt(While stmt);
+        }
+        
+        internal abstract T Accept<T>(IVisitor<T> visitor);
         internal abstract void Accept(IVisitor visitor);
         
         internal class Block : Stmt
@@ -25,6 +38,10 @@ namespace CLoxSh
             public Block(List<Stmt> Statements)
             {
                 this.Statements = Statements;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitBlockStmt(this);
             }
             internal override void Accept(IVisitor visitor)
             {
@@ -39,6 +56,10 @@ namespace CLoxSh
             public Expression(Expr Expr)
             {
                 this.Expr = Expr;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitExpressionStmt(this);
             }
             internal override void Accept(IVisitor visitor)
             {
@@ -58,6 +79,10 @@ namespace CLoxSh
                 this.Parameters = Parameters;
                 this.Body = Body;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitFunctionStmt(this);
+            }
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitFunctionStmt(this);
@@ -76,6 +101,10 @@ namespace CLoxSh
                 this.ThenBranch = ThenBranch;
                 this.ElseBranch = ElseBranch;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitIfStmt(this);
+            }
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitIfStmt(this);
@@ -89,6 +118,10 @@ namespace CLoxSh
             public Print(Expr Expression)
             {
                 this.Expression = Expression;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitPrintStmt(this);
             }
             internal override void Accept(IVisitor visitor)
             {
@@ -106,6 +139,10 @@ namespace CLoxSh
                 this.Keyword = Keyword;
                 this.Value = Value;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitReturnStmt(this);
+            }
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitReturnStmt(this);
@@ -122,6 +159,10 @@ namespace CLoxSh
                 this.Name = Name;
                 this.Initialiser = Initialiser;
             }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitVarStmt(this);
+            }
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitVarStmt(this);
@@ -137,6 +178,10 @@ namespace CLoxSh
             {
                 this.Condition = Condition;
                 this.Body = Body;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitWhileStmt(this);
             }
             internal override void Accept(IVisitor visitor)
             {

@@ -4,6 +4,18 @@ namespace CLoxSh
 {
     abstract class Expr
     {
+        internal interface IVisitor
+        {
+            void VisitAssignExpr(Assign expr);
+            void VisitBinaryExpr(Binary expr);
+            void VisitCallExpr(Call expr);
+            void VisitGroupingExpr(Grouping expr);
+            void VisitLiteralExpr(Literal expr);
+            void VisitLogicalExpr(Logical expr);
+            void VisitUnaryExpr(Unary expr);
+            void VisitVariableExpr(Variable expr);
+        }
+        
         internal interface IVisitor<T>
         {
             T VisitAssignExpr(Assign expr);
@@ -17,6 +29,7 @@ namespace CLoxSh
         }
         
         internal abstract T Accept<T>(IVisitor<T> visitor);
+        internal abstract void Accept(IVisitor visitor);
         
         internal class Assign : Expr
         {
@@ -31,6 +44,10 @@ namespace CLoxSh
             internal override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitAssignExpr(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitAssignExpr(this);
             }
         }
         
@@ -50,6 +67,10 @@ namespace CLoxSh
             {
                 return visitor.VisitBinaryExpr(this);
             }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitBinaryExpr(this);
+            }
         }
         
         internal class Call : Expr
@@ -68,6 +89,10 @@ namespace CLoxSh
             {
                 return visitor.VisitCallExpr(this);
             }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitCallExpr(this);
+            }
         }
         
         internal class Grouping : Expr
@@ -82,6 +107,10 @@ namespace CLoxSh
             {
                 return visitor.VisitGroupingExpr(this);
             }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitGroupingExpr(this);
+            }
         }
         
         internal class Literal : Expr
@@ -95,6 +124,10 @@ namespace CLoxSh
             internal override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitLiteralExpr(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitLiteralExpr(this);
             }
         }
         
@@ -114,6 +147,10 @@ namespace CLoxSh
             {
                 return visitor.VisitLogicalExpr(this);
             }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitLogicalExpr(this);
+            }
         }
         
         internal class Unary : Expr
@@ -130,6 +167,10 @@ namespace CLoxSh
             {
                 return visitor.VisitUnaryExpr(this);
             }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitUnaryExpr(this);
+            }
         }
         
         internal class Variable : Expr
@@ -143,6 +184,10 @@ namespace CLoxSh
             internal override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitVariableExpr(this);
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitVariableExpr(this);
             }
         }
         

@@ -9,6 +9,7 @@ namespace CLoxSh
     class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor
     {
         public readonly Environment Globals = new Environment();
+        private readonly Dictionary<Expr, int> _locals = new Dictionary<Expr, int>();
         private Environment _environment;
 
         public Interpreter()
@@ -30,6 +31,11 @@ namespace CLoxSh
             {
                 Program.RuntimeError(exception);
             }
+        }
+
+        public void Resolve(Expr expr, int depth)
+        {
+            _locals[expr] = depth;
         }
 
         private void Execute(Stmt statement)
@@ -125,7 +131,14 @@ namespace CLoxSh
         {
             var value = Evaluate(expr.Value);
 
-            _environment.Define(expr.Name, value);
+            if (_locals.TryGetValue(expr, out var distance))
+            {
+                _environment.AssignAt(distance, expr.Name, value);
+            }
+            else
+            {
+                Globals.Assign(expr.Name, value);
+            }
 
             return value;
         }
@@ -247,7 +260,19 @@ namespace CLoxSh
 
         public object VisitVariableExpr(Expr.Variable expr)
         {
-            return _environment.Get(expr.Name);
+            return LookUpVariable(expr.Name, expr);
+        }
+
+        private object LookUpVariable(Token name, Expr expr)
+        {
+            if (_locals.TryGetValue(expr, out int distance))
+            {
+                return _environment.GetAt(distance, name.Lexeme);
+            }
+            else
+            {
+                return Globals.Get(name);
+            }
         }
 
         private object Evaluate(Expr expr)
