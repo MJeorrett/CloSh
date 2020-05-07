@@ -17,14 +17,15 @@ namespace CLoxSh
                 Console.WriteLine("Usage: cloxsh [script]");
                 System.Environment.Exit(64);
             }
-            else if (args.Length == 1)
-            {
-                RunFile(args[0]);
-            }
-            else
-            {
-                RunPrompt();
-            }
+            RunFile(@"C:\git\tuesdaychain\CLoxSh\source.txt");
+            //else if (args.Length == 1)
+            //{
+            //    RunFile(args[0]);
+            //}
+            //else
+            //{
+            //    RunPrompt();
+            //}
         }
 
         private static void RunFile(string path)

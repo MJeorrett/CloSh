@@ -8,6 +8,7 @@ namespace CLoxSh
         {
             void VisitBlockStmt(Block stmt);
             void VisitExpressionStmt(Expression stmt);
+            void VisitFunctionStmt(Function stmt);
             void VisitIfStmt(If stmt);
             void VisitPrintStmt(Print stmt);
             void VisitVarStmt(Var stmt);
@@ -41,6 +42,24 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitExpressionStmt(this);
+            }
+        }
+        
+        internal class Function : Stmt
+        {
+            public readonly Token Name;
+            public readonly List<Token> Parameters;
+            public readonly List<Stmt> Body;
+            
+            public Function(Token Name, List<Token> Parameters, List<Stmt> Body)
+            {
+                this.Name = Name;
+                this.Parameters = Parameters;
+                this.Body = Body;
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitFunctionStmt(this);
             }
         }
         

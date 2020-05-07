@@ -1,4 +1,5 @@
 ﻿using CLoxSh.Exceptions;
+using CLoxSh.NativeFunctions;
 using System;
 using System.Collections.Generic;
 using static CLoxSh.TokenType;
@@ -7,7 +8,14 @@ namespace CLoxSh
 {
     class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor
     {
-        private Environment _environment = new Environment();
+        public readonly Environment Globals = new Environment();
+        private Environment _environment;
+
+        public Interpreter()
+        {
+            Globals.Define("clock", new Clock());
+            _environment = Globals;
+        }
 
         public void Interpret(List<Stmt> statements)
         {
@@ -34,7 +42,7 @@ namespace CLoxSh
             ExecuteBlock(stmt.Statements, new Environment(_environment));
         }
 
-        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        public void ExecuteBlock(List<Stmt> statements, Environment environment)
         {
             var previousEnvironment = _environment;
 
@@ -68,6 +76,13 @@ namespace CLoxSh
         public void VisitExpressionStmt(Stmt.Expression stmt)
         {
             Evaluate(stmt.Expr);
+        }
+
+        public void VisitFunctionStmt(Stmt.Function stmt)
+        {
+            var function = new CLoxShFunction(stmt);
+
+            _environment.Define(stmt.Name.Lexeme, function);
         }
 
         public void VisitPrintStmt(Stmt.Print stmt)
@@ -152,6 +167,31 @@ namespace CLoxSh
             }
 
             return null;
+        }
+
+        public object VisitCallExpr(Expr.Call expr)
+        {
+            var callee = Evaluate(expr.callee);
+
+            var arguments = new List<object>();
+
+            foreach (var argument in expr.arguments)
+            {
+                arguments.Add(Evaluate(argument));
+            }
+
+            if (callee is ICLoxShCallable function)
+            {
+                if (arguments.Count != function.Arity)
+                {
+                    throw new RuntimeException($"Expected {function.Arity} arguments, but got {arguments.Count}.", expr.closingParen);
+                }
+                return function.Call(this, arguments);
+            }
+            else
+            {
+                throw new RuntimeException("Can only call functinos and classes.", expr.closingParen);
+            }
         }
 
         public object VisitGroupingExpr(Expr.Grouping expr)

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 
 using static CLoxSh.TokenType;
+using static CLoxSh.Constants;
+using System.Reflection.Metadata;
 
 namespace CLoxSh
 {
@@ -39,15 +41,45 @@ namespace CLoxSh
         {
             try
             {
+                if (Match(FUN)) return Function("function");
                 if (Match(VAR)) return VarDeclaration();
 
                 return Statement();
             }
-            catch (ParserException exception)
+            catch (ParserException)
             {
                 Synchronize();
                 return null;
             }
+        }
+
+        private Stmt.Function Function(string kind)
+        {
+            var name = Consume(IDENTIFIER, $"Expect {kind} name.");
+            
+            Consume(LEFT_PAREN, $"Expect '(' after {kind} name.");
+
+            var parameters = new List<Token>();
+
+            if (!Check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= MAX_FUNC_PARAMETERS)
+                    {
+                        Error(Peek, $"Cannot have more than {MAX_FUNC_PARAMETERS}.");
+                    }
+
+                    parameters.Add(Consume(IDENTIFIER, "Expect parameter name."));
+                }
+                while (Match(COMMA));
+            }
+
+            Consume(RIGHT_PAREN, "Expect ')' after parameters.");
+            Consume(LEFT_BRACE, $"Expect '{{' before {kind} body.");
+            var body = Block();
+
+            return new Stmt.Function(name, parameters, body);
         }
 
         private Stmt VarDeclaration()
@@ -328,7 +360,48 @@ namespace CLoxSh
                 return new Expr.Unary(@operator, right);
             }
 
-            return Primary();
+            return Call();
+        }
+
+        private Expr Call()
+        {
+            var expr = Primary();
+
+            while (true)
+            {
+                if (Match(LEFT_PAREN))
+                {
+                    expr = FinishCall(expr);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return expr;
+        }
+
+        private Expr FinishCall(Expr callee)
+        {
+            var arguments = new List<Expr>();
+
+            if (!Check(RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= MAX_FUNC_PARAMETERS)
+                    {
+                        Error(Peek, $"Cannot have more than {MAX_FUNC_PARAMETERS} arguments.");
+                    }
+                    arguments.Add(Expression());
+                }
+                while (Match(COMMA));
+            }
+
+            var closingParen = Consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+            return new Expr.Call(callee, closingParen, arguments);
         }
 
         private Expr Primary()

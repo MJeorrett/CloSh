@@ -20,6 +20,11 @@ namespace CLoxSh
             return Parenthasize(expr.Operator.Lexeme, expr.Left, expr.Right);
         }
 
+        public string VisitCallExpr(Expr.Call expr)
+        {
+            throw new NotImplementedException();
+        }
+
         public string VisitGroupingExpr(Expr.Grouping expr)
         {
             return Parenthasize("group", expr.Expression);

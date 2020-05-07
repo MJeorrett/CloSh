@@ -25,5 +25,7 @@ namespace CLoxSh
             { "var",    VAR },
             { "while",  WHILE },
         };
+
+        public static readonly int MAX_FUNC_PARAMETERS = 255;
     }
 }

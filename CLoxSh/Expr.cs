@@ -8,6 +8,7 @@ namespace CLoxSh
         {
             T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
+            T VisitCallExpr(Call expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
@@ -48,6 +49,24 @@ namespace CLoxSh
             internal override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitBinaryExpr(this);
+            }
+        }
+        
+        internal class Call : Expr
+        {
+            public readonly Expr callee;
+            public readonly Token closingParen;
+            public readonly List<Expr> arguments;
+            
+            public Call(Expr callee, Token closingParen, List<Expr> arguments)
+            {
+                this.callee = callee;
+                this.closingParen = closingParen;
+                this.arguments = arguments;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitCallExpr(this);
             }
         }
         
