@@ -70,7 +70,16 @@ namespace CLoxSh
         public void VisitClassStmt(Stmt.Class stmt)
         {
             _environment.Define(stmt.Name.Lexeme, null);
-            var klass = new CLoxShClass(stmt.Name.Lexeme);
+
+            var methods = new Dictionary<string, CLoxShFunction>();
+
+            foreach (var method in stmt.Methods)
+            {
+                var function = new CLoxShFunction(method, _environment);
+                methods[method.Name.Lexeme] = function;
+            }
+
+            var klass = new CLoxShClass(stmt.Name.Lexeme, methods);
             _environment.Assign(stmt.Name, klass);
         }
 

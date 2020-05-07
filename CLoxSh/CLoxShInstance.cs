@@ -20,6 +20,10 @@ namespace CLoxSh
                 return value;
             }
 
+            var method = _klass.FindMethod(name.Lexeme);
+
+            if (method != null) return method;
+
             throw new RuntimeException($"Undefined property '{name.Lexeme}'.", name);
         }
 

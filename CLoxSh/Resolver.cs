@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CLoxSh
@@ -9,6 +10,7 @@ namespace CLoxSh
         {
             NONE,
             FUNCTION,
+            METHOD,
         }
 
         private readonly Interpreter _interpreter;
@@ -87,6 +89,11 @@ namespace CLoxSh
         {
             Declare(stmt.Name);
             Define(stmt.Name);
+
+            foreach (var method in stmt.Methods)
+            {
+                ResolveFunction(method, FunctionType.METHOD);
+            }
         }
 
         public void VisitExpressionStmt(Stmt.Expression stmt)
