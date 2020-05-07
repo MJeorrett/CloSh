@@ -10,13 +10,21 @@ namespace CLoxSh
         {
             NONE,
             FUNCTION,
+            INITIALISER,
             METHOD,
+        }
+
+        private enum ClassType
+        {
+            NONE,
+            CLASS,
         }
 
         private readonly Interpreter _interpreter;
         private readonly Stack<Dictionary<string, bool>> _scopes = new Stack<Dictionary<string, bool>>();
 
         private FunctionType _currentFunctionType = FunctionType.NONE;
+        private ClassType _currentClassType = ClassType.NONE;
 
         public void Resolve(List<Stmt> statements)
         {
@@ -87,6 +95,9 @@ namespace CLoxSh
 
         public void VisitClassStmt(Stmt.Class stmt)
         {
+            var enclosingClassType = _currentClassType;
+            _currentClassType = ClassType.CLASS;
+
             Declare(stmt.Name);
             Define(stmt.Name);
 
@@ -95,10 +106,13 @@ namespace CLoxSh
 
             foreach (var method in stmt.Methods)
             {
-                ResolveFunction(method, FunctionType.METHOD);
+                var functionType = method.Name.Lexeme == "init" ? FunctionType.INITIALISER : FunctionType.METHOD;
+                ResolveFunction(method, functionType);
             }
 
             EndScope();
+
+            _currentClassType = enclosingClassType;
         }
 
         public void VisitExpressionStmt(Stmt.Expression stmt)
@@ -164,6 +178,11 @@ namespace CLoxSh
 
         public void VisitThisExpr(Expr.This expr)
         {
+            if (_currentClassType == ClassType.NONE)
+            {
+                Program.Error(expr.keyword, "Cannot use 'this' outside of a class.");
+            }
+
             ResolveLocal(expr, expr.keyword);
         }
 
@@ -179,7 +198,15 @@ namespace CLoxSh
                 Program.Error(stmt.Keyword, "Cannot return from top-level code.");
             }
 
-            if (stmt.Value != null) Resolve(stmt.Value);
+            if (stmt.Value != null)
+            {
+                if (_currentFunctionType == FunctionType.INITIALISER)
+                {
+                    Program.Error(stmt.Keyword, "Cannot return a value from an initialiser.");
+                }
+
+                Resolve(stmt.Value);
+            }
         }
 
         public void VisitUnaryExpr(Expr.Unary expr)

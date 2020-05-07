@@ -10,20 +10,23 @@ namespace CLoxSh
 
         private readonly Stmt.Function _declaration;
         private readonly Environment _closure;
+        private readonly bool _isInitialiser;
 
         public LoxFunction(
             Stmt.Function declaration,
-            Environment closure)
+            Environment closure,
+            bool isInitialiser)
         {
             _declaration = declaration;
             _closure = closure;
+            _isInitialiser = isInitialiser;
         }
 
         public LoxFunction Bind(LoxInstance instance)
         {
             var environment = new Environment(_closure);
             environment.Define("this", instance);
-            return new LoxFunction(_declaration, environment);
+            return new LoxFunction(_declaration, environment, _isInitialiser);
         }
 
         public object Call(Interpreter interpreter, List<object> arguments)
@@ -44,8 +47,11 @@ namespace CLoxSh
             }
             catch (ReturnException exception)
             {
+                if (_isInitialiser) return _closure.GetAt(0, "this");
                 return exception.Value;
             }
+
+            if (_isInitialiser) return _closure.GetAt(0, "this");
 
             return null;
         }

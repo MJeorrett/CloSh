@@ -75,7 +75,7 @@ namespace CLoxSh
 
             foreach (var method in stmt.Methods)
             {
-                var function = new LoxFunction(method, _environment);
+                var function = new LoxFunction(method, _environment, method.Name.Lexeme == "init");
                 methods[method.Name.Lexeme] = function;
             }
 
@@ -102,7 +102,7 @@ namespace CLoxSh
 
         public void VisitFunctionStmt(Stmt.Function stmt)
         {
-            var function = new LoxFunction(stmt, _environment);
+            var function = new LoxFunction(stmt, _environment, false);
 
             _environment.Define(stmt.Name.Lexeme, function);
         }
