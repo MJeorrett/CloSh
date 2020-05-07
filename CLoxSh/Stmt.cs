@@ -11,6 +11,7 @@ namespace CLoxSh
             void VisitFunctionStmt(Function stmt);
             void VisitIfStmt(If stmt);
             void VisitPrintStmt(Print stmt);
+            void VisitReturnStmt(Return stmt);
             void VisitVarStmt(Var stmt);
             void VisitWhileStmt(While stmt);
         }
@@ -92,6 +93,22 @@ namespace CLoxSh
             internal override void Accept(IVisitor visitor)
             {
                 visitor.VisitPrintStmt(this);
+            }
+        }
+        
+        internal class Return : Stmt
+        {
+            public readonly Token Keyword;
+            public readonly Expr Value;
+            
+            public Return(Token Keyword, Expr Value)
+            {
+                this.Keyword = Keyword;
+                this.Value = Value;
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitReturnStmt(this);
             }
         }
         

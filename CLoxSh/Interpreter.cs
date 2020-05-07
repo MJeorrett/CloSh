@@ -80,7 +80,7 @@ namespace CLoxSh
 
         public void VisitFunctionStmt(Stmt.Function stmt)
         {
-            var function = new CLoxShFunction(stmt);
+            var function = new CLoxShFunction(stmt, _environment);
 
             _environment.Define(stmt.Name.Lexeme, function);
         }
@@ -90,6 +90,15 @@ namespace CLoxSh
             var value = Evaluate(stmt.Expression);
 
             Console.WriteLine(Stringify(value));
+        }
+
+        public void VisitReturnStmt(Stmt.Return stmt)
+        {
+            object value = null;
+
+            if (stmt.Value != null) value = Evaluate(stmt.Value);
+
+            throw new ReturnException(value);
         }
 
         public void VisitWhileStmt(Stmt.While stmt)

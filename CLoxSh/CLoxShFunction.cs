@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CLoxSh.Exceptions;
+using System;
 using System.Collections.Generic;
 
 namespace CLoxSh
@@ -8,15 +9,19 @@ namespace CLoxSh
         public int Arity => _declaration.Parameters.Count;
 
         private readonly Stmt.Function _declaration;
+        private readonly Environment _closure;
 
-        public CLoxShFunction(Stmt.Function declaration)
+        public CLoxShFunction(
+            Stmt.Function declaration,
+            Environment closure)
         {
             _declaration = declaration;
+            _closure = closure;
         }
 
         public object Call(Interpreter interpreter, List<object> arguments)
         {
-            var environment = new Environment(interpreter.Globals);
+            var environment = new Environment(_closure);
 
             for (int i = 0; i < _declaration.Parameters.Count; i++)
             {
@@ -26,7 +31,15 @@ namespace CLoxSh
 
             }
             
-            interpreter.ExecuteBlock(_declaration.Body, environment);
+            try
+            {
+                interpreter.ExecuteBlock(_declaration.Body, environment);
+            }
+            catch (ReturnException exception)
+            {
+                return exception.Value;
+            }
+
             return null;
         }
 
