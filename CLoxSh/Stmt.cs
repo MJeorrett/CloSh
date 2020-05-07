@@ -8,6 +8,7 @@ namespace CLoxSh
         {
             void VisitBlockStmt(Block stmt);
             void VisitExpressionStmt(Expression stmt);
+            void VisitIfStmt(If stmt);
             void VisitPrintStmt(Print stmt);
             void VisitVarStmt(Var stmt);
         }
@@ -16,11 +17,11 @@ namespace CLoxSh
         
         internal class Block : Stmt
         {
-            public readonly List<Stmt> statements;
+            public readonly List<Stmt> Statements;
             
-            public Block(List<Stmt> statements)
+            public Block(List<Stmt> Statements)
             {
-                this.statements = statements;
+                this.Statements = Statements;
             }
             internal override void Accept(IVisitor visitor)
             {
@@ -30,11 +31,11 @@ namespace CLoxSh
         
         internal class Expression : Stmt
         {
-            public readonly Expr expression;
+            public readonly Expr Expr;
             
-            public Expression(Expr expression)
+            public Expression(Expr Expr)
             {
-                this.expression = expression;
+                this.Expr = Expr;
             }
             internal override void Accept(IVisitor visitor)
             {
@@ -42,13 +43,31 @@ namespace CLoxSh
             }
         }
         
+        internal class If : Stmt
+        {
+            public readonly Expr Condition;
+            public readonly Stmt ThenBranch;
+            public readonly Stmt ElseBranch;
+            
+            public If(Expr Condition, Stmt ThenBranch, Stmt ElseBranch)
+            {
+                this.Condition = Condition;
+                this.ThenBranch = ThenBranch;
+                this.ElseBranch = ElseBranch;
+            }
+            internal override void Accept(IVisitor visitor)
+            {
+                visitor.VisitIfStmt(this);
+            }
+        }
+        
         internal class Print : Stmt
         {
-            public readonly Expr expression;
+            public readonly Expr Expression;
             
-            public Print(Expr expression)
+            public Print(Expr Expression)
             {
-                this.expression = expression;
+                this.Expression = Expression;
             }
             internal override void Accept(IVisitor visitor)
             {
@@ -58,13 +77,13 @@ namespace CLoxSh
         
         internal class Var : Stmt
         {
-            public readonly Token name;
-            public readonly Expr initialiser;
+            public readonly Token Name;
+            public readonly Expr Initialiser;
             
-            public Var(Token name, Expr initialiser)
+            public Var(Token Name, Expr Initialiser)
             {
-                this.name = name;
-                this.initialiser = initialiser;
+                this.Name = Name;
+                this.Initialiser = Initialiser;
             }
             internal override void Accept(IVisitor visitor)
             {

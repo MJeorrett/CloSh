@@ -67,10 +67,27 @@ namespace CLoxSh
 
         private Stmt Statement()
         {
+            if (Match(IF)) return IfStatement();
             if (Match(PRINT)) return PrintStatement();
             if (Match(LEFT_BRACE)) return new Stmt.Block(Block());
 
             return ExpressionStatement();
+        }
+
+        private Stmt IfStatement()
+        {
+            Consume(LEFT_PAREN, "Expect '(' after 'if'.");
+            var condition = Expression();
+            Consume(RIGHT_PAREN, "Expect ')' after if confition.");
+
+            var thenBranch = Statement();
+            Stmt elseBranch = null;
+            if (Match(ELSE))
+            {
+                elseBranch = Statement();
+            }
+
+            return new Stmt.If(condition, thenBranch, elseBranch);
         }
 
         private List<Stmt> Block()
@@ -112,7 +129,7 @@ namespace CLoxSh
 
         private Expr Assignment()
         {
-            var expr = Equality();
+            var expr = Or();
 
             if (Match(EQUAL))
             {
@@ -121,11 +138,39 @@ namespace CLoxSh
 
                 if (expr is Expr.Variable variableExpr)
                 {
-                    var name = variableExpr.name;
+                    var name = variableExpr.Name;
                     return new Expr.Assign(name, value);
                 }
 
                 Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
+        }
+
+        private Expr Or()
+        {
+            var expr = And();
+
+            while (Match(OR))
+            {
+                var @operator = Previous;
+                var right = And();
+                expr = new Expr.Logical(expr, @operator, right);
+            }
+
+            return expr;
+        }
+
+        private Expr And()
+        {
+            var expr = Equality();
+
+            while (Match(AND))
+            {
+                var @operator = Previous;
+                var right = Equality();
+                expr = new Expr.Logical(expr, @operator, right);
             }
 
             return expr;

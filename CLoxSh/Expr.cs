@@ -10,6 +10,7 @@ namespace CLoxSh
             T VisitBinaryExpr(Binary expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
+            T VisitLogicalExpr(Logical expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
@@ -18,13 +19,13 @@ namespace CLoxSh
         
         internal class Assign : Expr
         {
-            public readonly Token name;
-            public readonly Expr value;
+            public readonly Token Name;
+            public readonly Expr Value;
             
-            public Assign(Token name, Expr value)
+            public Assign(Token Name, Expr Value)
             {
-                this.name = name;
-                this.value = value;
+                this.Name = Name;
+                this.Value = Value;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {
@@ -78,6 +79,24 @@ namespace CLoxSh
             }
         }
         
+        internal class Logical : Expr
+        {
+            public readonly Expr Left;
+            public readonly Token Operator;
+            public readonly Expr Right;
+            
+            public Logical(Expr Left, Token Operator, Expr Right)
+            {
+                this.Left = Left;
+                this.Operator = Operator;
+                this.Right = Right;
+            }
+            internal override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitLogicalExpr(this);
+            }
+        }
+        
         internal class Unary : Expr
         {
             public readonly Token Operator;
@@ -96,11 +115,11 @@ namespace CLoxSh
         
         internal class Variable : Expr
         {
-            public readonly Token name;
+            public readonly Token Name;
             
-            public Variable(Token name)
+            public Variable(Token Name)
             {
-                this.name = name;
+                this.Name = Name;
             }
             internal override T Accept<T>(IVisitor<T> visitor)
             {

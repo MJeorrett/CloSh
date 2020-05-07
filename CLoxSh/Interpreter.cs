@@ -31,7 +31,7 @@ namespace CLoxSh
 
         public void VisitBlockStmt(Stmt.Block stmt)
         {
-            ExecuteBlock(stmt.statements, new Environment(_environment));
+            ExecuteBlock(stmt.Statements, new Environment(_environment));
         }
 
         private void ExecuteBlock(List<Stmt> statements, Environment environment)
@@ -53,14 +53,26 @@ namespace CLoxSh
             }
         }
 
+        public void VisitIfStmt(Stmt.If stmt)
+        {
+            if (IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+        }
+
         public void VisitExpressionStmt(Stmt.Expression stmt)
         {
-            Evaluate(stmt.expression);
+            Evaluate(stmt.Expr);
         }
 
         public void VisitPrintStmt(Stmt.Print stmt)
         {
-            var value = Evaluate(stmt.expression);
+            var value = Evaluate(stmt.Expression);
 
             Console.WriteLine(Stringify(value));
         }
@@ -69,19 +81,19 @@ namespace CLoxSh
         {
             object value = null;
 
-            if (stmt.initialiser != null)
+            if (stmt.Initialiser != null)
             {
-                value = Evaluate(stmt.initialiser);
+                value = Evaluate(stmt.Initialiser);
             }
 
-            _environment.Define(stmt.name.Lexeme, value);
+            _environment.Define(stmt.Name.Lexeme, value);
         }
 
         public object VisitAssignExpr(Expr.Assign expr)
         {
-            var value = Evaluate(expr.value);
+            var value = Evaluate(expr.Value);
 
-            _environment.Define(expr.name, value);
+            _environment.Define(expr.Name, value);
 
             return value;
         }
@@ -144,6 +156,22 @@ namespace CLoxSh
             return expr.Value;
         }
 
+        public object VisitLogicalExpr(Expr.Logical expr)
+        {
+            var left = Evaluate(expr.Left);
+
+            if (expr.Operator.Type == OR)
+            {
+                if (IsTruthy(left)) return left;
+            }
+            else
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(expr.Right);
+        }
+
         public object VisitUnaryExpr(Expr.Unary expr)
         {
             var right = Evaluate(expr.Right);
@@ -162,7 +190,7 @@ namespace CLoxSh
 
         public object VisitVariableExpr(Expr.Variable expr)
         {
-            return _environment.Get(expr.name);
+            return _environment.Get(expr.Name);
         }
 
         private object Evaluate(Expr expr)
